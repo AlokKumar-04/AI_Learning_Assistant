@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 3rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .header p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2rem;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .input-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            padding: 40px;
+            margin-bottom: 40px;
+            animation: slideInUp 0.6s ease;
+        }
+
+        .input-group-custom {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .topic-input {
+            flex: 1;
+            padding: 15px 25px;
+            font-size: 1.1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            transition: all 0.3s;
+        }
+
+        .topic-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-generate {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 15px 50px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: white;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-generate:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-generate:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .examples {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .example-tag {
+            background: #f0f0f0;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .example-tag:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .loading-container {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .loading-container.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 500;
+        }
+
+        .content-section {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            padding: 35px;
+            margin-bottom: 25px;
+            display: none;
+            animation: slideInUp 0.5s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
+        }
+
+        .explanation-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #444;
+        }
+
+        .summary-box {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+        }
+
+        .summary-text {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #333;
+            margin: 0;
+        }
+
+        .concept-card {
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .concept-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .concept-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .concept-description {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .qa-card {
+            background: #ffffff;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .qa-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.1);
+        }
+
+        .question-number {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            font-weight: 700;
+            margin-right: 10px;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .answer-label {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .answer-text {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #555;
+        }
+
+        .no-content {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+        }
+
+        .no-content i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+
+        .no-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .input-group-custom {
+                flex-direction: column;
+            }
+
+            .btn-generate {
+                width: 100%;
+            }
+
+            .input-card {
+                padding: 25px;
+            }
+
+            .content-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header">
+            <h1><i class="fas fa-graduation-cap"></i> Your's Learning Assistant</h1>
+            <p>AI-Powered Learning Assistant for Any Topic</p>
+        </div>
+
+        <div class="input-card">
+            <div class="input-group-custom">
+                <input 
+                    type="text" 
+                    class="topic-input" 
+                    id="topicInput" 
+                    placeholder="Enter any topic you want to learn about..."
+                >
+                <button class="btn-generate" onclick="generateContent()" id="generateBtn">
+                    <i class="fas fa-magic"></i> Generate
+                </button>
+            </div>
+            
+            <div class="examples">
+                <span style="color: #666; margin-right: 10px;">Try:</span>
+                <div class="example-tag" onclick="setTopic('Machine Learning')">Machine Learning</div>
+                <div class="example-tag" onclick="setTopic('Photosynthesis')">Photosynthesis</div>
+                <div class="example-tag" onclick="setTopic('Python Programming')">Python Programming</div>
+                <div class="example-tag" onclick="setTopic('World War II')">World War II</div>
+                <div class="example-tag" onclick="setTopic('Quantum Physics')">Quantum Physics</div>
+            </div>
+        </div>
+
+        <div class="loading-container" id="loading">
+            <div class="spinner"></div>
+            <p class="loading-text">Generating educational content...</p>
+            <p style="color: rgba(255,255,255,0.8); margin-top: 10px;">This may take a few moments</p>
+        </div>
+
+        <div id="results">
+            <div class="no-content" id="noContent">
+                <i class="fas fa-search"></i>
+                <h3>Enter a topic to get started</h3>
+                <p>Generate comprehensive educational content with AI</p>
+            </div>
+
+            <!-- Explanation Section -->
+            <div class="content-section" id="explanationSection">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <h2 class="section-title">Detailed Explanation</h2>
+                </div>
+                <div class="explanation-text" id="explanationContent"></div>
+            </div>
+
+            <!-- Summary Section -->
+            <div class="content-section" id="summarySection">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <h2 class="section-title">Quick Summary</h2>
+                </div>
+                <div class="summary-box">
+                    <p class="summary-text" id="summaryContent"></p>
+                </div>
+            </div>
+
+            <!-- Key Concepts Section -->
+            <div class="content-section" id="conceptsSection">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h2 class="section-title">Key Concepts</h2>
+                </div>
+                <div id="conceptsContent"></div>
+            </div>
+
+            <!-- Practice Questions Section -->
+            <div class="content-section" id="practiceSection">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <h2 class="section-title">Practice Questions</h2>
+                </div>
+                <div id="practiceContent"></div>
+            </div>
+
+            <!-- Interview Q&A Section -->
+            <div class="content-section" id="interviewSection">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <h2 class="section-title">Interview Questions & Answers</h2>
+                </div>
+                <div id="interviewContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function setTopic(topic) {
+            document.getElementById('topicInput').value = topic;
+            document.getElementById('topicInput').focus();
+        }
+
+        async function generateContent() {
+            const topic = document.getElementById('topicInput').value.trim();
+            
+            if (!topic) {
+                alert('Please enter a topic!');
+                return;
+            }
+
+            // Disable button and show loading
+            const generateBtn = document.getElementById('generateBtn');
+            generateBtn.disabled = true;
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('noContent').style.display = 'none';
+            
+            // Hide all content sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            try {
+                // Call your Django backend API
+                const response = await fetch('/api/generate/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ topic: topic })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to generate content');
+                }
+
+                const data = await response.json();
+                
+                // Hide loading
+                document.getElementById('loading').classList.remove('active');
+                generateBtn.disabled = false;
+                
+                // Display all sections
+                displayExplanation(data.explanation);
+                displaySummary(data.summary);
+                displayKeyConcepts(data.key_concepts);
+                displayPracticeQuestions(data.practice_questions);
+                displayInterviewQA(data.interview_qa);
+
+                // Scroll to results smoothly
+                setTimeout(() => {
+                    document.getElementById('explanationSection').scrollIntoView({ 
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }, 300);
+
+            } catch (error) {
+                document.getElementById('loading').classList.remove('active');
+                generateBtn.disabled = false;
+                alert('Error generating content. Please try again.\n\nMake sure your Django backend is running on the correct port.');
+                console.error(error);
+            }
+        }
+
+        function displayExplanation(explanation) {
+            const content = document.getElementById('explanationContent');
+            content.innerHTML = explanation.replace(/\n\n/g, '</p><p class="explanation-text">').replace(/\n/g, '<br>');
+            if (!content.innerHTML.startsWith('<p')) {
+                content.innerHTML = '<p class="explanation-text">' + content.innerHTML + '</p>';
+            }
+            document.getElementById('explanationSection').classList.add('active');
+        }
+
+        function displaySummary(summary) {
+            const content = document.getElementById('summaryContent');
+            content.textContent = summary;
+            document.getElementById('summarySection').classList.add('active');
+        }
+
+        function displayKeyConcepts(concepts) {
+            const content = document.getElementById('conceptsContent');
+            let html = '';
+            
+            concepts.forEach((item, index) => {
+                html += `
+                    <div class="concept-card" style="animation-delay: ${index * 0.1}s">
+                        <div class="concept-title">
+                            <i class="fas fa-star" style="color: #ffc107; margin-right: 8px;"></i>
+                            ${item.concept}
+                        </div>
+                        <div class="concept-description">${item.description}</div>
+                    </div>
+                `;
+            });
+            
+            content.innerHTML = html;
+            document.getElementById('conceptsSection').classList.add('active');
+        }
+
+        function displayPracticeQuestions(questions) {
+            const content = document.getElementById('practiceContent');
+            let html = '';
+            
+            questions.forEach((item, index) => {
+                html += `
+                    <div class="qa-card" style="animation-delay: ${index * 0.1}s">
+                        <div class="question-text">
+                            <span class="question-number">${index + 1}</span>
+                            ${item.question}
+                        </div>
+                        <span class="answer-label">
+                            <i class="fas fa-check-circle"></i> Answer
+                        </span>
+                        <div class="answer-text">${item.answer}</div>
+                    </div>
+                `;
+            });
+            
+            content.innerHTML = html;
+            document.getElementById('practiceSection').classList.add('active');
+        }
+
+        function displayInterviewQA(interviews) {
+            const content = document.getElementById('interviewContent');
+            let html = '';
+            
+            interviews.forEach((item, index) => {
+                html += `
+                    <div class="qa-card" style="animation-delay: ${index * 0.1}s">
+                        <div class="question-text">
+                            <span class="question-number">${index + 1}</span>
+                            ${item.question}
+                        </div>
+                        <span class="answer-label" style="background: #17a2b8;">
+                            <i class="fas fa-lightbulb"></i> Professional Answer
+                        </span>
+                        <div class="answer-text">${item.answer}</div>
+                    </div>
+                `;
+            });
+            
+            content.innerHTML = html;
+            document.getElementById('interviewSection').classList.add('active');
+        }
+
+        // Allow Enter key to submit
+        document.getElementById('topicInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateContent();
+            }
+        });
+
+        // Focus on input when page loads
+        window.addEventListener('load', function() {
+            document.getElementById('topicInput').focus();
+        });
+    </script>
+</body>
+</html>
