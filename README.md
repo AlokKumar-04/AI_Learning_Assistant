@@ -336,7 +336,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Alok Kumar**
 
 - GitHub: [@AlokKumar-04](https://github.com/AlokKumar-04)
-- LinkedIn: [Your LinkedIn Profile](https://www.linkedin.com/in/alok-kumar-panda-864b421a4/)
+- LinkedIn: [LinkedIn Profile](https://www.linkedin.com/in/alok-kumar-panda-864b421a4/)
 
 ---
 
