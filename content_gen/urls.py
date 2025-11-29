@@ -1,8 +1,7 @@
 from django.urls import path
-from .views import index
-
-app_name = 'content_gen'
+from . import views
 
 urlpatterns = [
-    path('', index, name='index'),
+    path('', views.index, name='index'),
+    path('api/generate/', views.generate_content, name='generate_content'),
 ]
