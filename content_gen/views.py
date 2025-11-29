@@ -3,6 +3,8 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 from huggingface_hub import InferenceClient
+import os
+from decouple import config
 
 @csrf_exempt
 def generate_content(request):
@@ -38,7 +40,7 @@ def generate_content(request):
 
 def call_huggingface_inference(prompt, max_tokens=800):
     # REPLACE WITH YOUR HUGGING FACE TOKEN
-    api_token = "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"
+    api_token = config('HUGGINGFACE_TOKEN', default='YOUR_HUGGINGFACE_TOKEN_HERE')
     
     if api_token == "YOUR_HUGGINGFACE_TOKEN_HERE":
         error_msg = "ERROR: Please add your Hugging Face token in views.py"
